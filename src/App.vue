@@ -1,33 +1,37 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-      <!-- <el-button type="primary">123</el-button> -->
-    </div>
+  <div>
+    <!-- <p class="hello">Hello vant</p> -->
     <router-view />
   </div>
 </template>
 
+<script>
+import { Button } from 'vant'
+export default {
+  components: {
+    [Button.name]: Button
+  },
+  created () {
+    /* 屏幕适配设置 */
+    var htmlWidth = document.documentElement.clientWidth || document.body.clientWidth
+    if (htmlWidth > 750) {
+      htmlWidth = 750
+    }
+    var htmlDom = document.getElementsByTagName('html')[0]
+    htmlDom.style.fontSize = htmlWidth / 20 + 'px'
+  }
+}
+</script>
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* rem = px/16 */
+/* .test {
+  width: 20rem;
+  height: 10rem;
+  background-color: bisque;
   text-align: center;
-  color: #2c3e50;
 }
-
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
+.hello {
+  color: red;
+  font-size: 1rem;
+} */
 </style>
