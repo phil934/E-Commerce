@@ -470,6 +470,7 @@ var list = {
   page: null,
   limit: null
 }
+var user = []
 
 export default {
   'get|/parameter/search': (option) => { // 查询数据
@@ -479,5 +480,27 @@ export default {
       message: '查询成功！'
     }
     return data// 返回这个数组,也就是返回处理后的假数据
+  },
+  'get|/user/resgister': (option) => { // 查询数据
+    console.log('register', option.body.userName)
+    // user = this.$store.getters.user
+    if (user.length !== 0) {
+      user.forEach(item => {
+        if (item.userName !== JSON.parse(option.body).userName) {
+          // this.$store.dispatch('setAccount', JSON.parse(option.body)) // ActionJs
+          user.push(JSON.parse(option.body))
+        }
+      })
+    } else {
+      // this.$store.dispatch('setAccount', JSON.parse(option.body)) // ActionJs
+      user.push(JSON.parse(option.body))
+    }
+    console.log('user', user)
+    const data = {
+      data: [],
+      status: 200,
+      message: '注册成功'
+    }
+    return data // 返回这个数组,也就是返回处理后的假数据
   }
 }

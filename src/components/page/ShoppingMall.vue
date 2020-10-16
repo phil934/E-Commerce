@@ -10,7 +10,7 @@
           <input type="text" class="location-input" placeholder="查找">
         </van-col>
         <van-col span="6" class="location-colBtn">
-          <van-button size="mini" class="location-btn">Sreach</van-button>
+          <van-button size="mini" class="location-btn" @click="register">Sreach</van-button>
         </van-col>
       </van-row>
     </div>
@@ -50,14 +50,32 @@
             <div class="recommend-item">
               <img v-lazy="goods.image" width="80%" />
               <p>{{goods.goodsName}}</p>
-              <p>¥{{goods.price}}(¥{{goods.mallPrice}})</p>
+              <p>¥{{goods.price | tomoney}}(¥{{goods.mallPrice}})</p>
             </div>
           </swiper-slide>
           <div class="swiper-pagination" slot="pagination"></div>
         </swiper>
       </div>
     </div>
-    <!-- <swiperTemplate></swiperTemplate> -->
+    <!-- floor one area -->
+    <floorTemplate :floorData="floorDataOne" :floorTitle="floorName.floor1"></floorTemplate>
+    <!-- floor two area -->
+    <floorTemplate :floorData="floorDataTwo" :floorTitle="floorName.floor2"></floorTemplate>
+    <!-- floor three area -->
+    <floorTemplate :floorData="floorDataThree" :floorTitle="floorName.floor3"></floorTemplate>
+    <!-- hot Goods area-->
+    <div class="hot-area">
+      <div class="hot-title">热卖商品</div>
+      <div class="hot-goods">
+        <van-list :finished="finished" :finished-text="finishedText" :offset="10" :loading-text="loadingText" :error-text="errorText" :immediate-check="false">
+          <van-row :gutter="20">
+            <van-col :span="12" v-for="(item,index) in hotGoods" :key="index">
+              <goods-info-template :goodsImage="item.image" :goodsName="item.name" :goodsPrice="item.price"></goods-info-template>
+            </van-col>
+          </van-row>
+        </van-list>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -65,28 +83,44 @@
 import 'swiper/css/swiper.css'
 import { Swiper, SwiperSlide } from 'vue-awesome-swiper'
 // import swiperTemplate from './swiper'
+import floorTemplate from '../component/FloorComponent'
+import { toMoney } from '../../js/fliter/MoneyFilter'
+import GoodsInfoTemplate from '../component/GoodsInfoComponets'
 export default {
   components: {
     Swiper,
-    SwiperSlide
+    SwiperSlide,
+    floorTemplate,
+    GoodsInfoTemplate
     // swiperTemplate
   },
   data () {
     return {
+      finished: false,
+      finishedText: '',
+      loading: false,
+      loadingText: '加载中...',
+      errorText: '加载失败',
       msg: 'Shopping Mall',
-      locationIcon: require('../assets/images/icon/location.png'),
+      locationIcon: require('../../assets/images/icon/location.png'),
       category: [], // 分类数组
       adBanner: [], // 广告
       bannerPicArray: [], // 轮播图地址
       recommendGoods: [], // 推荐商品
+      floorDataOne: [], // 楼层1
+      floorName: {}, // 楼层标题
+      floorDataTwo: [], // 楼层2
+      floorDataThree: [], // 楼层3
+      hotGoods: [], // 热卖商品
       SwiperOption: {
         // loop: true,
         pagination: {
           el: '.swiper-pagination',
           clickable: true
         }
-        // direction: 'vertical'
-      }
+      },
+      page: 1,
+      limit: 6
     }
   },
   created () {
@@ -107,11 +141,25 @@ export default {
         this.adBanner = res.data.data.data.advertesPicture
         this.bannerPicArray = res.data.data.data.slides
         this.recommendGoods = res.data.data.data.recommend // 推荐商品
-        // console.log(this.recommendGoods)
+        this.floorDataOne = res.data.data.data.floor1 // 楼层1
+        this.floorDataTwo = res.data.data.data.floor2 // 楼层2
+        this.floorDataThree = res.data.data.data.floor3 // 楼层三
+        this.floorName = res.data.data.data.floorName // 楼层标题
+        this.hotGoods = res.data.data.data.hotGoods
       }
     }).catch((err) => {
       console.log(err)
     })
+  },
+  methods: {
+    register () {
+      this.$router.push('/register')
+    }
+  },
+  filters: {
+    tomoney (money) {
+      return toMoney(money)
+    }
   }
 }
 </script>
@@ -123,6 +171,9 @@ export default {
   background-color: #e5017d;
   line-height: 2.2rem;
   overflow: hidden;
+  /* position: fixed;
+  top: 0;
+  left: 0; */
 }
 .location-input {
   width: 100%;
@@ -152,7 +203,7 @@ export default {
   align-items: center;
 }
 .swiper-area {
-  max-height: 20rem;
+  max-height: 9rem;
   clear: both;
   overflow: hidden;
 }
@@ -192,5 +243,57 @@ export default {
   border-right: 1px solid #eee;
   font-size: 12px;
   text-align: center;
+}
+.floor-anomaly {
+  display: flex;
+  flex-direction: row;
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+}
+.floor-anomaly div {
+  width: 10rem;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+.floor-one {
+  border-right: 1px solid #ddd;
+}
+.floor-two {
+  border-bottom: 1px solid #ddd;
+}
+.floor-rule {
+  display: flex;
+  flex-direction: row;
+  background-color: #fff;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #ddd;
+}
+.floor-rule div {
+  width: 10rem;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+.floor-rule div:nth-child(odd) {
+  border-right: 1px solid #ddd;
+}
+.hot-goods {
+  height: 130rem;
+  overflow: hidden;
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+}
+.hot-area {
+  text-align: center;
+  font-size: 14px;
+  height: 1.8rem;
+  line-height: 1.8rem;
+}
+.hot-title {
+  font-size: 16px;
+  padding: 0.2rem;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  color: #e5017d;
 }
 </style>
